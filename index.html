@@ -277,7 +277,27 @@
     color:var(--ink-faint);
     background:rgba(10,12,18,0.55);
   }
+  .demo-error[hidden]{display:none;}
   .demo-error code{color:var(--blue);}
+
+  .demo-enlarge-btn{
+    position:absolute;
+    right:12px;
+    bottom:12px;
+    width:34px;height:34px;
+    border-radius:8px;
+    background:rgba(10,12,18,0.6);
+    border:1px solid rgba(255,255,255,0.16);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .3s ease, background .2s ease, transform .2s ease;
+    z-index:5;
+  }
+  .demo-slide.is-playing .demo-enlarge-btn{opacity:1;pointer-events:auto;}
+  .demo-enlarge-btn:hover{background:rgba(10,12,18,0.9);transform:scale(1.06);}
+  .demo-enlarge-btn svg{width:16px;height:16px;stroke:var(--ink);}
 
   .demo-card{
     position:absolute;
@@ -529,6 +549,9 @@
               <source src="videos/PORTFOLIO-SONJA.mp4" type="video/mp4">
             </video>
             <p class="demo-error" hidden>Couldn&#8217;t load this video &mdash; check that the <code>videos/</code> folder sits next to this HTML file.</p>
+          <button class="demo-enlarge-btn" type="button" aria-label="Enlarge video">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          </button>
           </div>
           <button class="demo-card" type="button" aria-label="Play Sonja demo">
             <span class="demo-card-title">Sonja</span>
@@ -544,6 +567,9 @@
               <source src="videos/PORTFOLIO-FLIGHT-RADAR.mp4" type="video/mp4">
             </video>
             <p class="demo-error" hidden>Couldn&#8217;t load this video &mdash; check that the <code>videos/</code> folder sits next to this HTML file.</p>
+          <button class="demo-enlarge-btn" type="button" aria-label="Enlarge video">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          </button>
           </div>
           <button class="demo-card" type="button" aria-label="Play Flight Radar demo">
             <span class="demo-card-title">Flight Radar</span>
@@ -559,6 +585,9 @@
               <source src="videos/PORTFOLIO-BAURIS.mp4" type="video/mp4">
             </video>
             <p class="demo-error" hidden>Couldn&#8217;t load this video &mdash; check that the <code>videos/</code> folder sits next to this HTML file.</p>
+          <button class="demo-enlarge-btn" type="button" aria-label="Enlarge video">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          </button>
           </div>
           <button class="demo-card" type="button" aria-label="Play Bauris demo">
             <span class="demo-card-title">Bauris</span>
@@ -574,6 +603,9 @@
               <source src="videos/PORTFOLIO-SSB.mp4" type="video/mp4">
             </video>
             <p class="demo-error" hidden>Couldn&#8217;t load this video &mdash; check that the <code>videos/</code> folder sits next to this HTML file.</p>
+          <button class="demo-enlarge-btn" type="button" aria-label="Enlarge video">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          </button>
           </div>
           <button class="demo-card" type="button" aria-label="Play SSB demo">
             <span class="demo-card-title">SSB</span>
@@ -589,6 +621,9 @@
               <source src="videos/PORTFOLIO-EXERCISE.mp4" type="video/mp4">
             </video>
             <p class="demo-error" hidden>Couldn&#8217;t load this video &mdash; check that the <code>videos/</code> folder sits next to this HTML file.</p>
+          <button class="demo-enlarge-btn" type="button" aria-label="Enlarge video">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          </button>
           </div>
           <button class="demo-card" type="button" aria-label="Play Exercise demo">
             <span class="demo-card-title">Exercise</span>
@@ -604,6 +639,9 @@
               <source src="videos/PORTFOLIO-LCS.mp4" type="video/mp4">
             </video>
             <p class="demo-error" hidden>Couldn&#8217;t load this video &mdash; check that the <code>videos/</code> folder sits next to this HTML file.</p>
+          <button class="demo-enlarge-btn" type="button" aria-label="Enlarge video">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          </button>
           </div>
           <button class="demo-card" type="button" aria-label="Play Lost Crown Spire demo">
             <span class="demo-card-title">Lost Crown Spire</span>
@@ -707,7 +745,17 @@
       const desc = slide.querySelector('.demo-desc');
       const hint = slide.querySelector('.demo-pause-hint');
       const errorMsg = slide.querySelector('.demo-error');
+      const enlargeBtn = slide.querySelector('.demo-enlarge-btn');
       desc.textContent = slide.getAttribute('data-desc') || '';
+
+      if (enlargeBtn){
+        enlargeBtn.addEventListener('click', function(e){
+          e.stopPropagation();
+          if (video.requestFullscreen) video.requestFullscreen();
+          else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+          else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen(); // iOS Safari
+        });
+      }
 
       video.addEventListener('error', function(){
         if (errorMsg) errorMsg.hidden = false;
