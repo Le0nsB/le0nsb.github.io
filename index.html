@@ -488,6 +488,52 @@
   .footer-row{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono', monospace;font-size:11px;color:var(--ink-faint);letter-spacing:0.05em;border-top:1px solid var(--line);padding-top:20px;}
   @media (max-width:520px){ .footer-row{flex-direction:column;gap:8px;align-items:flex-start;} }
 
+  /* ============ RESPONSIVE ============ */
+
+  /* tablet / small laptop */
+  @media (max-width:760px){
+    .section-head{flex-direction:column;align-items:flex-start;gap:6px;margin-bottom:32px;padding-bottom:14px;}
+    .section-head .idx{white-space:normal;}
+    .hero-sub{font-size:16px;}
+    .contact-cards{grid-template-columns:1fr;}
+  }
+
+  /* phone */
+  @media (max-width:480px){
+    body{font-size:15px;}
+    .wrap{padding:0 16px;}
+    .hero{padding:40px 0 16px;}
+    h1.headline{font-size:clamp(1.95rem, 8.5vw, 2.5rem);margin-bottom:18px;}
+    .tag-line{font-size:11px;margin-bottom:16px;}
+    .hero-sub{margin-bottom:26px;}
+    .spec-table{max-width:none;}
+    .spec-row{grid-template-columns:98px 1fr;gap:10px;}
+    .spec-row .v{font-size:13.5px;}
+    section{padding:46px 0;scroll-margin-top:64px;}
+    .section-head h2{font-size:1.5rem;}
+    .emblem-wrap svg{max-width:250px;}
+    .about-grid p{font-size:15px;}
+    .parts-grid{grid-template-columns:1fr;}
+    .part{padding:18px 20px;}
+    .contact-panel{padding:24px 18px;}
+    .contact-lead{font-size:14.5px;margin-bottom:24px;}
+    .contact-card{padding:18px 16px 16px;}
+    .contact-card .go{top:16px;right:16px;}
+    .demo-nav{justify-content:center;}
+    .footer-row{font-size:10px;}
+  }
+
+  /* very small phones */
+  @media (max-width:360px){
+    nav.wrap{height:56px;}
+    .brand{font-size:15px;}
+    .brand small{display:none;}
+    .nav-links{gap:12px;}
+    .nav-links a{font-size:10px;}
+    .spec-row{grid-template-columns:1fr;gap:3px;}
+    .spec-row .k{padding-top:0;}
+  }
+
   @media (prefers-reduced-motion: reduce){
     *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important;}
     .project{opacity:1;transform:none;}
