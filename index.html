@@ -166,14 +166,14 @@
   /* --- 3D lanyard (three.js) --- */
   .lanyard-canvas{
     position:absolute;
-    top:0;
+    top:64px;               /* start below the sticky header so the lanyard never covers the nav */
     left:0;
     width:100%;
-    height:100vh;
-    height:100dvh;
+    height:calc(100vh - 64px);
+    height:calc(100dvh - 64px);
     touch-action:none;
     pointer-events:none;
-    z-index:31;
+    z-index:20;             /* above hero content, below the header (z-index:30) */
   }
   .lanyard-canvas.is-hover{cursor:grab;}
   .lanyard-canvas.is-dragging{cursor:grabbing;}
@@ -1014,7 +1014,7 @@
   function layoutAnchor(){
     var halfH = camera.position.z * FOV_T;
     var halfW = halfH * camera.aspect;
-    anchor.y = (-1.7 + halfH) - 1.3;
+    anchor.y = (-1.7 + halfH) - 0.6;   /* clip hangs just below the top edge of the canvas (already below the nav) */
     anchor.x = Math.max(0.6, Math.min(halfW - 1.0, 5.0));
     if (clipGroup) clipGroup.position.copy(anchor);
     if (points.length){ points[0].x = anchor.x; points[0].y = anchor.y; points[0].z = anchor.z; }
