@@ -166,13 +166,14 @@
   /* --- 3D lanyard (three.js) --- */
   .lanyard-canvas{
     position:absolute;
-    top:74px;
-    right:32px;
-    width:270px;
-    height:500px;
+    top:0;
+    left:0;
+    width:100%;
+    height:100vh;
+    height:100dvh;
     touch-action:none;
     pointer-events:none;
-    z-index:20;
+    z-index:31;
   }
   .lanyard-canvas.is-hover{cursor:grab;}
   .lanyard-canvas.is-dragging{cursor:grabbing;}
@@ -236,14 +237,14 @@
   .demo-slide{
     position:relative;
     flex:0 0 340px;
-    height:460px;
+    height:500px;
     border-radius:16px;
     overflow:hidden;
     background:#12151f;
     border:1px solid var(--line);
     scroll-snap-align:start;
   }
-  @media (max-width:520px){ .demo-slide{flex-basis:82vw;height:420px;} }
+  @media (max-width:520px){ .demo-slide{flex-basis:82vw;height:470px;} }
 
   .demo-media{
     position:absolute;
@@ -252,7 +253,7 @@
     background:linear-gradient(160deg, #2a2f45, #14161f 70%);
     transition:height .6s cubic-bezier(.65,.05,.36,1);
   }
-  .demo-slide.is-playing .demo-media{height:56%;}
+  .demo-slide.is-playing .demo-media{height:44%;}
   .demo-video{
     width:100%;height:100%;
     object-fit:cover;
@@ -333,17 +334,22 @@
     left:0;top:auto;bottom:0;
     transform:none;
     width:100%;
-    height:44%;
+    height:56%;
     min-height:0;
     border-radius:0;
     border-left:none;border-right:none;border-bottom:none;
     flex-direction:column;
     align-items:flex-start;
-    justify-content:center;
+    justify-content:flex-start;
+    gap:2px;
     padding:16px 20px;
     cursor:default;
     background:rgba(20,22,32,0.82);
+    overflow-y:auto;
+    overscroll-behavior:contain;
   }
+  .demo-slide.is-playing .demo-card::-webkit-scrollbar{width:5px;}
+  .demo-slide.is-playing .demo-card::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px;}
   .demo-card-title{
     font-family:'Space Grotesk', sans-serif;
     font-weight:600;
@@ -370,7 +376,7 @@
     overflow:hidden;
     transition:opacity .4s ease .2s;
   }
-  .demo-slide.is-playing .demo-desc{opacity:1;max-height:120px;}
+  .demo-slide.is-playing .demo-desc{opacity:1;max-height:340px;}
   .demo-pause-hint{
     font-family:'IBM Plex Mono', monospace;
     font-size:10px;
@@ -380,6 +386,27 @@
     transition:opacity .4s ease .25s;
   }
   .demo-slide.is-playing .demo-pause-hint{opacity:1;cursor:pointer;}
+  .demo-tech{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:10px;
+    opacity:0;
+    max-height:0;
+    overflow:hidden;
+    transition:opacity .4s ease .25s;
+  }
+  .demo-slide.is-playing .demo-tech{opacity:1;max-height:160px;}
+  .demo-tech span{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.03em;
+    color:var(--blue);
+    border:1px solid var(--glass-border);
+    background:rgba(169,199,255,0.08);
+    padding:3px 8px;
+    border-radius:6px;
+  }
 
   .demo-nav{display:flex;gap:10px;margin-top:14px;}
   .demo-nav button{
@@ -617,7 +644,7 @@
         <p>I'm a programming student from Latvia who likes making things that are actually useful to me. I usually start with some random idea that I think would be interesting and then eventually turn it into an actual project.</p>
         <p>I like experimenting with different things, whether it's programming, hardware, or just figuring out how something works. I don't always know exactly what I'm doing when I start, but that's kind of the point I learn as I go and keep messing with it until it works.</p>
         <p>I'm especially interested in projects where I can combine programming with something that's personal to me and reflects who I am.</p>
-        <p>I placed 3rd at Draugiem Group's Cannes à l'Écran contest in June 2025, then spent summer 2026 doing a Programming Technician placement in Portugal.</p>
+        <p>I also placed 3rd at Draugiem Group's Cannes à l'Écran contest in June 2025, then spent summer 2026 doing a Programming Technician placement in Portugal.</p>
       </div>
     </div>
   </section>
@@ -844,6 +871,17 @@
   // ---- project demo carousel ----
   (function(){
     const slides = document.querySelectorAll('.demo-slide');
+
+    // Tech stack per project, keyed by the demo card title.
+    const TECH = {
+      'Sonja':            ['Laravel', 'PHP', 'JavaScript', 'Tailwind CSS', 'PWA'],
+      'Flight Radar':     ['Laravel', 'PHP', 'Google Maps API', 'OpenSky API', 'Tailwind CSS'],
+      'Bauris':           ['Laravel', 'React', 'Tailwind CSS'],
+      'SSB':              ['Laravel', 'PHP', 'Blade', 'Tailwind CSS'],
+      'Exercise':         ['PHP', 'HTML', 'CSS', 'JavaScript'],
+      'Lost Crown Spire': ['Godot']
+    };
+
     slides.forEach(function(slide){
       const card = slide.querySelector('.demo-card');
       const video = slide.querySelector('.demo-video');
@@ -851,7 +889,20 @@
       const hint = slide.querySelector('.demo-pause-hint');
       const errorMsg = slide.querySelector('.demo-error');
       const enlargeBtn = slide.querySelector('.demo-enlarge-btn');
+      const titleEl = slide.querySelector('.demo-card-title');
       desc.textContent = slide.getAttribute('data-desc') || '';
+
+      const techList = (titleEl && TECH[titleEl.textContent.trim()]) || [];
+      if (techList.length){
+        const techWrap = document.createElement('div');
+        techWrap.className = 'demo-tech';
+        techList.forEach(function(t){
+          const chip = document.createElement('span');
+          chip.textContent = t;
+          techWrap.appendChild(chip);
+        });
+        desc.insertAdjacentElement('afterend', techWrap);
+      }
 
       if (enlargeBtn){
         enlargeBtn.addEventListener('click', function(e){
@@ -951,12 +1002,33 @@
   fill.position.set(-3, -1, 4);
   scene.add(fill);
 
+  // the lanyard hangs from this point; positioned for the current viewport in layoutAnchor()
+  var anchor = new THREE.Vector3(0, 3.1, 0);
+  var clipGroup = null;
+  var points = [];
+
+  // pull the camera back as the canvas grows so the badge keeps a constant on-screen size
+  var FOV_T = Math.tan((camera.fov * Math.PI / 180) / 2);
+  var PX_PER_UNIT = 500 / (2 * 10.5 * FOV_T);
+
+  function layoutAnchor(){
+    var halfH = camera.position.z * FOV_T;
+    var halfW = halfH * camera.aspect;
+    anchor.y = (-1.7 + halfH) - 1.3;
+    anchor.x = Math.max(0.6, Math.min(halfW - 1.0, 5.0));
+    if (clipGroup) clipGroup.position.copy(anchor);
+    if (points.length){ points[0].x = anchor.x; points[0].y = anchor.y; points[0].z = anchor.z; }
+  }
+
   function resize(){
-    var w = canvas.clientWidth || 210;
-    var h = canvas.clientHeight || 400;
+    var w = canvas.clientWidth || window.innerWidth || 210;
+    var h = canvas.clientHeight || window.innerHeight || 400;
     renderer.setSize(w, h, false);
+    camera.position.z = h / (2 * PX_PER_UNIT * FOV_T);
     camera.aspect = w / h;
+    camera.lookAt(0, -1.7, 0);
     camera.updateProjectionMatrix();
+    layoutAnchor();
   }
   resize();
   window.addEventListener('resize', resize);
@@ -990,14 +1062,12 @@
     tctx.fillStyle = grad;
     tctx.fillRect(58, 115, w-116, 17);
 
-    // hole
-    tctx.beginPath();
-    tctx.arc(w/2, 55, 18, 0, Math.PI*2);
-    tctx.fillStyle = 'rgba(10,12,18,0.9)';
-    tctx.fill();
-    tctx.lineWidth = 2.4;
-    tctx.strokeStyle = 'rgba(255,255,255,0.15)';
-    tctx.stroke();
+    // soft laminate sheen
+    var sheen = tctx.createRadialGradient(w*0.32, h*0.14, 24, w*0.32, h*0.14, w);
+    sheen.addColorStop(0, 'rgba(255,255,255,0.07)');
+    sheen.addColorStop(1, 'rgba(255,255,255,0)');
+    tctx.fillStyle = sheen;
+    tctx.fillRect(0, 0, w, h);
 
     // avatar
     var cx = w/2, cy = 246, r = 118;
@@ -1028,6 +1098,8 @@
     tctx.fillStyle = '#ECEEF5';
     tctx.font = "700 48px 'Space Grotesk', sans-serif";
     tctx.fillText('Leons', w/2, 408);
+    tctx.fillStyle = '#A9C7FF';
+    tctx.fillRect(w/2 - 44, 424, 88, 3);
 
     // role
     tctx.fillStyle = '#A6AFC4';
@@ -1061,6 +1133,15 @@
       var bh = 17 + ((i*37) % 41);
       tctx.fillRect(58 + i*gap, barsY - bh, gap*0.45, bh);
     }
+    tctx.fillStyle = '#4A5266';
+    tctx.font = "400 13px 'IBM Plex Mono', monospace";
+    tctx.textAlign = 'center';
+    tctx.fillText('LV • 2026 • PROGRAMMING TECHNICIAN', w/2, 700);
+
+    // printed inner keyline
+    tctx.strokeStyle = 'rgba(169,199,255,0.16)';
+    tctx.lineWidth = 2;
+    tctx.strokeRect(22, 22, w-44, h-44);
 
     texture.needsUpdate = true;
   }
@@ -1071,20 +1152,52 @@
   avatarImg.onload = drawTexture;
   drawTexture();
 
-  // ---- badge mesh ----
+  // ---- badge: printed card inside a clear plastic holder ----
   var cardW = 1.6, cardH = 2.15, cardD = 0.085;
-  var edgeMat = new THREE.MeshStandardMaterial({color: 0x232838, roughness:0.5, metalness:0.15});
-  var frontMat = new THREE.MeshStandardMaterial({color: 0xffffff, roughness:0.45, metalness:0.1, map: texture});
-  var backMat = new THREE.MeshStandardMaterial({color: 0x1B202E, roughness:0.6, metalness:0.1});
-  var cardGeo = new THREE.BoxGeometry(cardW, cardH, cardD);
-  var cardMesh = new THREE.Mesh(cardGeo, [edgeMat, edgeMat, edgeMat, edgeMat, frontMat, backMat]);
+
+  function roundedRectShape(rw, rh, rr){
+    var sh = new THREE.Shape(), x = -rw/2, y = -rh/2;
+    sh.moveTo(x + rr, y);
+    sh.lineTo(x + rw - rr, y);  sh.quadraticCurveTo(x + rw, y, x + rw, y + rr);
+    sh.lineTo(x + rw, y + rh - rr);  sh.quadraticCurveTo(x + rw, y + rh, x + rw - rr, y + rh);
+    sh.lineTo(x + rr, y + rh);  sh.quadraticCurveTo(x, y + rh, x, y + rh - rr);
+    sh.lineTo(x, y + rr);  sh.quadraticCurveTo(x, y, x + rr, y);
+    return sh;
+  }
+  var edgeMat  = new THREE.MeshStandardMaterial({color: 0xe7e4da, roughness:0.6, metalness:0.0});
+  var frontMat = new THREE.MeshStandardMaterial({color: 0xffffff, roughness:0.45, metalness:0.08, map: texture});
+  var backMat  = new THREE.MeshStandardMaterial({color: 0x171C2A, roughness:0.6, metalness:0.05});
+  var cardMesh = new THREE.Mesh(new THREE.BoxGeometry(cardW, cardH, cardD),
+    [edgeMat, edgeMat, edgeMat, edgeMat, frontMat, backMat]);   // stays the drag hit-target
   var badgeGroup = new THREE.Group();
   badgeGroup.add(cardMesh);
+
+  // clear plastic holder — rounded, a little larger than the card, taller at the top
+  var holderW = cardW + 0.15, holderH = cardH + 0.26, holderD = cardD + 0.12, holderYOff = 0.09;
+  var holderMat = new THREE.MeshStandardMaterial({
+    color: 0xeaf1ff, transparent:true, opacity:0.13,
+    roughness:0.08, metalness:0.0, side: THREE.DoubleSide, depthWrite:false
+  });
+  var holderGeo = new THREE.ExtrudeGeometry(roundedRectShape(holderW, holderH, 0.16),
+    {depth: holderD, bevelEnabled:true, bevelThickness:0.02, bevelSize:0.02, bevelSegments:3, curveSegments:12});
+  holderGeo.translate(0, holderYOff, -holderD/2);
+  var holderMesh = new THREE.Mesh(holderGeo, holderMat);
+  holderMesh.renderOrder = 4;
+  badgeGroup.add(holderMesh);
+
+  // faint frosted strip across the top of the holder, where the slot is punched
+  var holderTopMat = new THREE.MeshStandardMaterial({color: 0xdbe2ee, transparent:true, opacity:0.28, roughness:0.5, metalness:0.0, depthWrite:false});
+  var holderTopGeo = new THREE.ExtrudeGeometry(roundedRectShape(holderW - 0.05, 0.26, 0.06),
+    {depth: holderD + 0.01, bevelEnabled:false, curveSegments:8});
+  holderTopGeo.translate(0, holderYOff + holderH/2 - 0.19, -(holderD + 0.01)/2);
+  var holderTop = new THREE.Mesh(holderTopGeo, holderTopMat);
+  holderTop.renderOrder = 3;
+  badgeGroup.add(holderTop);
+
   scene.add(badgeGroup);
 
   // ---- clip at anchor ----
-  var anchor = new THREE.Vector3(0, 3.1, 0);
-  var clipGroup = new THREE.Group();
+  clipGroup = new THREE.Group();
   var clipMat = new THREE.MeshStandardMaterial({color: 0x3A4258, roughness:0.4, metalness:0.35});
   var clipBox = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.3, 0.19), clipMat);
   clipBox.position.set(0, 0.1, 0);
@@ -1096,10 +1209,38 @@
   clipGroup.position.copy(anchor);
   scene.add(clipGroup);
 
+  // ---- slot + crimp + ring joining the lanyard to the holder ----
+  // children of badgeGroup, so they inherit its position + twist every frame.
+  var linkMat = new THREE.MeshStandardMaterial({color: 0xAEB9CE, roughness:0.32, metalness:0.7});
+  var metalTop = holderYOff + holderH / 2;   // top edge of the plastic holder
+
+  // punched lanyard slot through the holder's reinforced strip
+  var slot = new THREE.Mesh(
+    new THREE.BoxGeometry(0.44, 0.075, holderD + 0.05),
+    new THREE.MeshStandardMaterial({color: 0x0b0e16, roughness:0.7, metalness:0.0}));
+  slot.position.set(0, metalTop - 0.16, 0);
+  badgeGroup.add(slot);
+
+  // flattened metal eyelet around the slot
+  var eyelet = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.02, 8, 24), linkMat);
+  eyelet.scale.set(1.75, 0.6, 1);
+  eyelet.position.set(0, metalTop - 0.16, holderD / 2);
+  badgeGroup.add(eyelet);
+
+  // metal crimp folded over the top edge of the holder
+  var crimp = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.16, holderD + 0.07), linkMat);
+  crimp.position.set(0, metalTop + 0.02, 0);
+  badgeGroup.add(crimp);
+
+  // the connecting ring the lanyard threads through
+  var linkRing = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.038, 12, 30), linkMat);
+  linkRing.position.set(0, metalTop + 0.19, 0);
+  badgeGroup.add(linkRing);
+
   // ---- rope physics (3D verlet) ----
   var N = 11;
-  var segLen = 0.46;
-  var points = [];
+  var segLen = 0.5;
+  points = [];
   for (var i=0;i<N;i++){
     points.push({
       x: anchor.x, y: anchor.y - i*segLen*0.001, z: anchor.z,
@@ -1113,14 +1254,113 @@
   var gravity = -0.010;
   var damping = 0.958;
 
-  var ropeMat = new THREE.MeshStandardMaterial({color: 0xA9C7FF, roughness:0.5, metalness:0.05, emissive:0x2a3a6a, emissiveIntensity:0.15});
+  // ---- woven lanyard strap ----
+  var strapCanvas = document.createElement('canvas');
+  strapCanvas.width = 96; strapCanvas.height = 512;
+  var sctx = strapCanvas.getContext('2d');
+  (function drawStrap(){
+    var w = strapCanvas.width, h = strapCanvas.height, d;
+    var g = sctx.createLinearGradient(0, 0, w, 0);
+    g.addColorStop(0, '#38456a'); g.addColorStop(0.5, '#5468a0'); g.addColorStop(1, '#38456a');
+    sctx.fillStyle = g; sctx.fillRect(0, 0, w, h);
+    // diagonal weave
+    sctx.lineWidth = 2;
+    sctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    for (d = -h; d < w + h; d += 7){ sctx.beginPath(); sctx.moveTo(d, 0); sctx.lineTo(d + h, h); sctx.stroke(); }
+    sctx.strokeStyle = 'rgba(0,0,0,0.10)';
+    for (d = -h; d < w + h; d += 7){ sctx.beginPath(); sctx.moveTo(d + 3.5, 0); sctx.lineTo(d + 3.5 - h, h); sctx.stroke(); }
+    // selvage edge stripes
+    sctx.fillStyle = 'rgba(255,255,255,0.13)';
+    sctx.fillRect(6, 0, 3, h); sctx.fillRect(w - 9, 0, 3, h);
+    // printed wordmark running along the strap
+    sctx.save();
+    sctx.translate(w / 2, h / 2); sctx.rotate(-Math.PI / 2);
+    sctx.fillStyle = 'rgba(12,15,24,0.5)';
+    sctx.font = "700 24px 'Space Grotesk', Arial, sans-serif";
+    sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+    sctx.fillText('LEONS · DEV · LEONS · DEV', 0, 0);
+    sctx.restore();
+  })();
+  var strapTex = new THREE.CanvasTexture(strapCanvas);
+  strapTex.wrapS = strapTex.wrapT = THREE.RepeatWrapping;
+  strapTex.repeat.set(1, 6);
+  strapTex.anisotropy = 4;
+  strapTex.colorSpace = THREE.SRGBColorSpace || strapTex.colorSpace;
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function(){ /* redraw once the display font is ready */
+      drawStrapText(); strapTex.needsUpdate = true;
+    });
+  }
+  function drawStrapText(){
+    var w = strapCanvas.width, h = strapCanvas.height;
+    sctx.save();
+    sctx.translate(w / 2, h / 2); sctx.rotate(-Math.PI / 2);
+    sctx.fillStyle = 'rgba(12,15,24,0.5)';
+    sctx.font = "700 24px 'Space Grotesk', Arial, sans-serif";
+    sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+    sctx.fillText('LEONS · DEV · LEONS · DEV', 0, 0);
+    sctx.restore();
+  }
+
+  var ropeMat = new THREE.MeshStandardMaterial({
+    map: strapTex, color: 0xccd6ef,
+    roughness: 0.82, metalness: 0.0,
+    emissive: 0x141a2e, emissiveIntensity: 0.22,
+    side: THREE.DoubleSide
+  });
   var ropeMesh = null;
+
+  var STRAP_W = 0.22, STRAP_T = 0.03, STRAP_STEPS = 46;
+  var _fwd = new THREE.Vector3(0, 0, 1);
+  var _t = new THREE.Vector3(), _u = new THREE.Vector3(), _n = new THREE.Vector3();
 
   function rebuildRope(){
     var vecs = [];
-    for (var i=0;i<N;i++) vecs.push(new THREE.Vector3(points[i].x, points[i].y, points[i].z));
+    for (var i = 0; i < N; i++) vecs.push(new THREE.Vector3(points[i].x, points[i].y, points[i].z));
     var curve = new THREE.CatmullRomCurve3(vecs);
-    var geo = new THREE.TubeGeometry(curve, 48, 0.055, 8, false);
+
+    var steps = STRAP_STEPS, hw = STRAP_W / 2, ht = STRAP_T / 2;
+    var baseTwist = (typeof torsionAngle === 'number') ? torsionAngle : 0;
+    var pos = [], uv = [], idx = [];
+
+    for (var s = 0; s <= steps; s++){
+      var t = s / steps;
+      var c = curve.getPoint(t);
+      _t.copy(curve.getTangent(t)).normalize();
+      _u.crossVectors(_t, _fwd);
+      if (_u.lengthSq() < 1e-6) _u.set(1, 0, 0);
+      _u.normalize();
+      _n.crossVectors(_u, _t).normalize();
+      // no twist at the clip, building to a lanyard-style roll near the badge
+      var roll = baseTwist * t + 0.5 * t * t + Math.sin(t * Math.PI) * 0.13;
+      _u.applyAxisAngle(_t, roll);
+      _n.applyAxisAngle(_t, roll);
+
+      var ax = _u.x * hw, ay = _u.y * hw, az = _u.z * hw;
+      var bx = _n.x * ht, by = _n.y * ht, bz = _n.z * ht;
+      pos.push(
+        c.x + ax + bx, c.y + ay + by, c.z + az + bz,
+        c.x - ax + bx, c.y - ay + by, c.z - az + bz,
+        c.x - ax - bx, c.y - ay - by, c.z - az - bz,
+        c.x + ax - bx, c.y + ay - by, c.z + az - bz
+      );
+      uv.push(0, t, 1, t, 0, t, 1, t);
+
+      if (s < steps){
+        var a = s * 4, b = (s + 1) * 4;
+        idx.push(a, a + 1, b + 1, a, b + 1, b);       // face A
+        idx.push(a + 2, a + 3, b + 3, a + 2, b + 3, b + 2); // face B
+        idx.push(a + 1, a + 2, b + 2, a + 1, b + 2, b + 1); // edge
+        idx.push(a + 3, a, b, a + 3, b, b + 3);       // edge
+      }
+    }
+
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    geo.setIndex(idx);
+    geo.computeVertexNormals();
+
     if (ropeMesh){ scene.remove(ropeMesh); ropeMesh.geometry.dispose(); }
     ropeMesh = new THREE.Mesh(geo, ropeMat);
     scene.add(ropeMesh);
@@ -1171,7 +1411,7 @@
     badgeGroup.quaternion.copy(twist.multiply(q));
 
     var attach = new THREE.Vector3(last.x, last.y, last.z);
-    var center = attach.clone().add(upDir.clone().multiplyScalar(-cardH*0.52));
+    var center = attach.clone().add(upDir.clone().multiplyScalar(-cardH*0.69));
     badgeGroup.position.copy(center);
 
     renderer.render(scene, camera);
@@ -1234,6 +1474,7 @@
     if (dragging){ dragging = false; document.body.style.cursor = ''; }
   });
 
+  layoutAnchor();
   rebuildRope();
   renderer.render(scene, camera);
 
